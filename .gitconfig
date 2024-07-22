@@ -1,0 +1,3 @@
+[alias]
+    test = log
+    all-in = !git add -A && git commit ${@:-All in.} && git push -f
