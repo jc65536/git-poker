@@ -1,3 +1,10 @@
 [alias]
-    test = log
-    all-in = !git add -A && git commit ${@:-All in.} && git push -f
+    # Self explanatory
+    all-in = !git add -A && git commit "${@:-All in.}" && git push -f
+    # Fold = discard your hand (changes)
+    fold = reset --hard
+    # Straddling is betting on top of the big blind, similar to rebasing your
+    # commits on top of another branch. Both can be risky.
+    straddle = rebase
+    # Neutral action
+    check = status
