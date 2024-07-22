@@ -13,4 +13,4 @@
     check = status
 
     # Family pot is when everyone's in
-    family-pot = "!for head in $(git for-each-ref --format=\"%(refname:short)\" refs/heads); do git switch \"$head\" && git push -f; done"
+    family-pot = "!for head in \"$(git for-each-ref --format='%(refname:short)' refs/heads)\"; do git switch \"$head\" && git push -f; done"
