@@ -33,4 +33,41 @@
     shove = all-in
 
     call = "! \
-        #"
+        if (( $# < 1 )); then \
+            echo \"Usage: git call [commit-options] <branch>\"; \
+            exit 1; \
+        fi; \
+        new_commit_count=1; \
+        branch=\"${@: -1}\"; \
+        echo \"Calling $branch\"; \
+        commit() { \
+            git commit \"${@:--m Calling $branch #$new_commit_count}\"; \
+        }; \
+        commit_empty() { \
+            git commit --allow-empty \"${@:--m Calling $branch #$new_commit_count}\"; \
+        }; \
+        while true; do \
+            count_head=\"$(git rev-list --count @)\"; \
+            count_branch=\"$(git rev-list --count \"$branch\")\"; \
+            count_diff=$(( count_branch - count_head )); \
+            if (( count_diff <= 0 )); then \
+                break; \
+            elif (( count_diff == 1 )); then \
+                git add -A && \
+                commit \"${@:1:$# - 1}\"; \
+                break; \
+            else \
+                files_changed=\"$(git diff --name-only | wc -l)\"; \
+                if (( files_changed == 0 )); then \
+                    for (( ; count_diff > 0; count_diff -- )); do \
+                        commit_empty \"${@:1:$# - 1}\"; \
+                        (( new_commit_count++ )); \
+                    done; \
+                    break; \
+                else \
+                    echo 'y\nq' | git add --patch > /dev/null 2>&1 && \
+                    commit \"${@:1:$# - 1}\"; \
+                fi; \
+            fi; \
+            (( new_commit_count++ )); \
+        done #"
