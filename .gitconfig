@@ -1,16 +1,36 @@
 [alias]
     # Self explanatory
-    all-in = "!git add -A && git commit \"${@:--m All in.}\" && git push -f #"
+    all-in = "! \
+        git add -A && \
+        git commit \"${@:--m All in.}\" && \
+        git push -f && \
+        echo 'All in! Remember to rotate your secrets.' #"
 
     # Fold = discard your cards (changes)
     fold = reset --hard
+
+    # Neutral action
+    check = status
+
+    raise = ! git add -A && git commit
 
     # Straddling is betting on top of the big blind, similar to rebasing on top
     # of another branch. Both can be risky.
     straddle = rebase
 
-    # Neutral action
-    check = status
-
     # Family pot is when everyone's in
-    family-pot = "!git for-each-ref --format='%(refname:short)' refs/heads | while read -r head; do git switch \"$head\" && git push; done #"
+    family-pot = "! \
+        git for-each-ref --format='%(refname:short)' refs/heads | \
+        while read -r head; do \
+            git switch \"$head\" && \
+            git add -A && \
+            git commit \"$@\"; \
+        done #"
+
+    # First three cards
+    flop = log -n 3
+
+    shove = all-in
+
+    call = "! \
+        #"
