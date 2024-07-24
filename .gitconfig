@@ -1,9 +1,9 @@
 [alias]
     # Self explanatory
     all-in = "! \
-        git add -A && \
-        git commit \"${@:--m All in.}\" && \
-        git push -f && \
+        git add -A \n \
+        git commit \"${@:--m All in.}\" \n \
+        git push -f && \n \
         echo 'All in! Remember to rotate your secrets.' #"
 
     # Fold = discard your cards (changes)
@@ -20,11 +20,11 @@
 
     # Family pot is when everyone's in
     family-pot = "! \
-        git for-each-ref --format='%(refname:short)' refs/heads | \
-        while read -r head; do \
-            git switch \"$head\" && \
-            git add -A && \
-            git commit \"$@\"; \
+        git for-each-ref --format='%(refname:short)' refs/heads | \n \
+        while read -r head; do \n \
+            git switch \"$head\" \n \
+            git add -A \n \
+            git commit \"$@\" \n \
         done #"
 
     # First three cards
@@ -33,41 +33,41 @@
     shove = all-in
 
     call = "! \
-        if (( $# < 1 )); then \
-            echo \"Usage: git call [commit-options] <branch>\"; \
-            exit 1; \
-        fi; \
-        new_commit_count=1; \
-        branch=\"${@: -1}\"; \
-        echo \"Calling $branch\"; \
-        commit() { \
-            git commit \"${@:--m Calling $branch #$new_commit_count}\"; \
-        }; \
-        commit_empty() { \
-            git commit --allow-empty \"${@:--m Calling $branch #$new_commit_count}\"; \
-        }; \
-        while true; do \
-            count_head=\"$(git rev-list --count @)\"; \
-            count_branch=\"$(git rev-list --count \"$branch\")\"; \
-            count_diff=$(( count_branch - count_head )); \
-            if (( count_diff <= 0 )); then \
-                break; \
-            elif (( count_diff == 1 )); then \
-                git add -A && \
-                commit \"${@:1:$# - 1}\"; \
-                break; \
-            else \
-                files_changed=\"$(git diff --name-only | wc -l)\"; \
-                if (( files_changed == 0 )); then \
-                    for (( ; count_diff > 0; count_diff -- )); do \
-                        commit_empty \"${@:1:$# - 1}\"; \
-                        (( new_commit_count++ )); \
-                    done; \
-                    break; \
-                else \
-                    echo 'y\nq' | git add --patch > /dev/null 2>&1 && \
-                    commit \"${@:1:$# - 1}\"; \
-                fi; \
-            fi; \
-            (( new_commit_count++ )); \
+        if (( $# < 1 )); then \n \
+            echo \"Usage: git call [commit-options] <branch>\" \n \
+            exit 1 \n \
+        fi \n \
+        new_commit_count=1 \n \
+        branch=\"${@: -1}\" \n \
+        echo \"Calling $branch\" \n \
+        commit() { \n \
+            git commit \"${@:--m Calling $branch #$new_commit_count}\" \n \
+        } \n \
+        commit_empty() { \n \
+            git commit --allow-empty \"${@:--m Calling $branch #$new_commit_count}\" \n \
+        } \n \
+        while true; do \n \
+            count_head=\"$(git rev-list --count @)\" \n \
+            count_branch=\"$(git rev-list --count \"$branch\")\" \n \
+            count_diff=$(( count_branch - count_head )) \n \
+            if (( count_diff <= 0 )); then \n \
+                break \n \
+            elif (( count_diff == 1 )); then \n \
+                git add -A \n \
+                commit_empty \"${@:1:$# - 1}\" \n \
+                break \n \
+            else \n \
+                files_changed=\"$(git diff --name-only | wc -l)\" \n \
+                if (( files_changed == 0 )); then \n \
+                    for (( ; count_diff > 0; count_diff -- )); do \n \
+                        commit_empty \"${@:1:$# - 1}\" \n \
+                        (( new_commit_count++ )) \n \
+                    done \n \
+                    break \n \
+                else \n \
+                    echo 'y\nq' | git add --patch > /dev/null 2>&1 \n \
+                    commit \"${@:1:$# - 1}\" \n \
+                fi \n \
+            fi \n \
+            (( new_commit_count++ )) \n \
         done #"
