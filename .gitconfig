@@ -6,7 +6,9 @@
         git push -f && \n \
         echo 'All in! Remember to rotate your secrets.' #"
 
-    # Fold = discard your cards (changes)
+    shove = all-in
+
+    # Discard all uncommitted changes
     fold = reset --hard
 
     # Neutral action
@@ -14,24 +16,29 @@
 
     raise = ! git add -A && git commit
 
-    # Straddling is betting on top of the big blind, similar to rebasing on top
-    # of another branch. Both can be risky.
+    # Betting on top of the big blind is like rebasing on top of another branch.
+    # Both can be risky.
     straddle = rebase
 
-    # Family pot is when everyone's in
+    # Pushes all branches
     family-pot = "! \
         git for-each-ref --format='%(refname:short)' refs/heads | \n \
         while read -r head; do \n \
             git switch \"$head\" \n \
             git add -A \n \
             git commit \"$@\" \n \
+            git push \n \
         done #"
 
-    # First three cards
+    # First three commits
     flop = log -n 3
 
-    shove = all-in
-
+    # Creates a number of commits on the current branch such that the number of
+    # commits on this branch is equal to the number of commits on the specified
+    # branch. The strategy is to create one commit for each hunk (as defined by
+    # `git add --patch`). If there are more than enough hunks, the final commit
+    # will contain all the remaining changes. If there aren't enough hunks,
+    # empty commits will be created.
     call = "! \
         if (( $# < 1 )); then \n \
             echo \"Usage: git call [commit-options] <branch>\" \n \
@@ -39,13 +46,13 @@
         fi \n \
         new_commit_count=1 \n \
         branch=\"${@: -1}\" \n \
-        echo \"Calling $branch\" \n \
         commit() { \n \
             git commit \"${@:--m Calling $branch #$new_commit_count}\" \n \
         } \n \
         commit_empty() { \n \
             git commit --allow-empty \"${@:--m Calling $branch #$new_commit_count}\" \n \
         } \n \
+        git reset \n \
         while true; do \n \
             count_head=\"$(git rev-list --count @)\" \n \
             count_branch=\"$(git rev-list --count \"$branch\")\" \n \
